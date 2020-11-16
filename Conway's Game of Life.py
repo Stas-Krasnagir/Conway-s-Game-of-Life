@@ -1,51 +1,43 @@
-import random, time
+import random
+import time
 
 
 def create_universe(height, length):
-    grid = [[0] * length] * height
+    grid = [[1] * length] * height
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             grid[i][j] = random.randrange(2)
-    return grid
+        return grid
 
 
-length = 5
-height = 5
-#grid = create_universe(height, length)
+length = int(input("Lenght: "))
+height = int(input("Height: "))
 
-grid = [[0, 1, 0, 1, 0, 0],
-        [0, 1, 0, 1, 1, 0],
-        [0, 0, 1, 1, 1, 1],
-        [0, 1, 1, 1, 0, 0],
-        [1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 1, 0, 1]]
+grid = create_universe(height, length)
+
+
+# grid = [[0, 0, 0, 1, 0, 0],
+#        [0, 1, 1, 1, 0, 0],
+#        [0, 0, 1, 0, 1, 0],
+#        [0, 1, 1, 0, 1, 0],
+#        [0, 1, 0, 1, 0, 0],
+#        [0, 0, 0, 0, 0, 0]]
 
 
 def game_step(grid):
     new_grid = grid.copy()
     for i in range(len(new_grid)):
         for j in range(len(new_grid[0])):
-            a = validate(i - 1, j - 1, new_grid)
-            b = validate(i - 1, j, new_grid)
-            c = validate(i - 1, j, new_grid)
-
-            d = validate(i, j - 1, new_grid)
-            e = validate(i, j + 1, new_grid)
-
-            f = validate(i + 1, j - 1, new_grid)
-            g = validate(i + 1, j, new_grid)
-            h = validate(i + 1, j + 1, new_grid)
-
-            if new_grid[i][j] == 0:
-                res_for_dead = a + b + c + d + e + f + g + h
-                if res_for_dead == 3:
-                    new_grid[i][j] = 1
-            if new_grid[i][j] == 1:
-                res_for_life = a + b + c + d + e + f + g + h
-                if res_for_life == 2 or res_for_life == 3:
-                    new_grid[i][j] = 1
-                else:
-                    new_grid[i][j] = 0
+            res = validate(i - 1, j - 1, new_grid) + validate(i - 1, j, new_grid) + \
+                  validate(i - 1, j, new_grid) + validate(i, j - 1, new_grid) + \
+                  validate(i, j + 1, new_grid) + validate(i + 1, j - 1, new_grid) + \
+                  validate(i + 1, j, new_grid) + validate(i + 1, j + 1, new_grid)
+            if new_grid[i][j] == 0 and res == 3:
+                new_grid[i][j] = 1
+            if new_grid[i][j] == 1 and res == 2 or res == 3:
+                new_grid[i][j] = 1
+            else:
+                new_grid[i][j] = 0
     return new_grid
 
 
@@ -57,11 +49,13 @@ def validate(i, j, new_grid):
         return res
 
 
-print(grid)
-time.sleep(1)
-count = 0
-while count < 5:
-    print(game_step(grid))
-    time.sleep(1)
-    grid = game_step(grid)
-    count += 1
+def output_grid(grid):
+    while True:
+        print('\n'.join(' '.join(str(x) for x in row) for row in reversed(game_step(grid))))
+        time.sleep(1)
+        grid = game_step(grid)
+        from shutil import get_terminal_size
+        print("\n" * get_terminal_size().lines, end='')
+
+
+print(output_grid(grid))
