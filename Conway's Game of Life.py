@@ -3,29 +3,38 @@ import time
 
 
 def create_universe(height, length):
-    grid = [[1] * length] * height
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            grid[i][j] = random.randrange(2)
-        return grid
+    zero_grid = []
+    for i in range(length):
+        zero_grid.append([0] * height)
+    return zero_grid
 
-
-length = int(input("Lenght: "))
+length = int(input("Length: "))
 height = int(input("Height: "))
+living_cells = int(input("Number of living cells: "))
 
-grid = create_universe(height, length)
+zero_grid = create_universe(height, length)
 
+def set_living_cells(zero_grid, living_cells):
+    life_grid = zero_grid.copy()
+    count = 0
+    while count < living_cells:
+        i = random.randint(0, height - 1)
+        j = random.randint(0, length - 1)
+        if life_grid[i][j] == 0:
+            life_grid[i][j] = 1
+            count += 1
+    return life_grid
+life_grid = set_living_cells(zero_grid, living_cells)
 
-# grid = [[0, 0, 0, 1, 0, 0],
-#        [0, 1, 1, 1, 0, 0],
-#        [0, 0, 1, 0, 1, 0],
-#        [0, 1, 1, 0, 1, 0],
-#        [0, 1, 0, 1, 0, 0],
-#        [0, 0, 0, 0, 0, 0]]
+def validate(i, j, new_grid):
+    if 0 < i < len(new_grid) and 0 < j < len(new_grid[0]):
+        return new_grid[i][j]
+    else:
+        res = 0
+        return res
 
-
-def game_step(grid):
-    new_grid = grid.copy()
+def game_step(life_grid):
+    new_grid = life_grid.copy()
     for i in range(len(new_grid)):
         for j in range(len(new_grid[0])):
             res = validate(i - 1, j - 1, new_grid) + validate(i - 1, j, new_grid) + \
@@ -41,21 +50,15 @@ def game_step(grid):
     return new_grid
 
 
-def validate(i, j, new_grid):
-    if 0 < i < len(new_grid) and 0 < j < len(new_grid[0]):
-        return new_grid[i][j]
-    else:
-        res = 0
-        return res
+new_grid = game_step(life_grid)
 
 
-def output_grid(grid):
+def output_grid(new_grid):
     while True:
-        print('\n'.join(' '.join(str(x) for x in row) for row in reversed(game_step(grid))))
+        print('\n'.join(' '.join(str(x) for x in row) for row in reversed(game_step(new_grid))))
         time.sleep(1)
-        grid = game_step(grid)
-        from shutil import get_terminal_size
-        print("\n" * get_terminal_size().lines, end='')
+        new_grid = game_step(new_grid)
+        import os
+        os.system("clear")
 
-
-print(output_grid(grid))
+output_grid(new_grid)
